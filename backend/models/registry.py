@@ -2,14 +2,15 @@ import torch
 import gc
 
 class ModelRegistry:
-    def __init__(self, max_vram_mb=5000):
+    def __init__(self, max_vram_mb=5000, max_cached_models=4):
         self._cache = {}
         self.max_vram_mb = max_vram_mb
+        self.max_cached_models = max_cached_models  # CPU fallback: cap by count instead of memory
         self.gpu_available = torch.cuda.is_available()
 
     def _current_vram_mb(self):
         if not self.gpu_available:
-            return 0  # no GPU ceiling to enforce on CPU-only machines
+            return 0
         return torch.cuda.memory_reserved() / 1024**2
 
     def _evict_oldest(self, protect_key=None):
@@ -39,7 +40,13 @@ class ModelRegistry:
                 if not evicted:
                     print("Warning: over VRAM budget but nothing left to evict!")
                     break
+        else:
+            # CPU fallback: cap by number of cached models instead of memory tracking
+            while len(self._cache) > self.max_cached_models:
+                evicted = self._evict_oldest(protect_key=name)
+                if not evicted:
+                    break
 
         return loaded
 
-registry = ModelRegistry(max_vram_mb=5000)
+registry = ModelRegistry(max_vram_mb=5000, max_cached_models=4)
