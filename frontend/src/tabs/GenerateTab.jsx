@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function GenerateTab() {
   const [prompt, setPrompt] = useState("");
   const [output, setOutput] = useState("");
@@ -9,10 +11,10 @@ function GenerateTab() {
     setOutput("");
     setLoading(true);
     try {
-      const response = await fetch("http://127.0.0.1:8000/generate", {
+      const response = await fetch(`${API_URL}/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, max_new_tokens: 150, temperature: 0.7 }),
+        body: JSON.stringify({ prompt, max_new_tokens: 60, temperature: 0.7 }),
       });
 
       const reader = response.body.getReader();

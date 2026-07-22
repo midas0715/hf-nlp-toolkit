@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function ZeroShotTab() {
   const [text, setText] = useState("");
   const [labelsInput, setLabelsInput] = useState("technology, sports, finance, cooking");
@@ -11,7 +13,7 @@ function ZeroShotTab() {
     const labels = labelsInput.split(",").map((l) => l.trim()).filter(Boolean);
     setLoading(true);
     try {
-      const res = await axios.post("http://127.0.0.1:8000/zero-shot", { text, labels });
+      const res = await axios.post(`${API_URL}/zero-shot`, { text, labels });
       setResults(res.data.result);
     } catch (err) {
       console.error(err);

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function NERTab() {
   const [text, setText] = useState("");
   const [entities, setEntities] = useState(null);
@@ -9,7 +11,7 @@ function NERTab() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("http://127.0.0.1:8000/ner", { text });
+      const res = await axios.post(`${API_URL}/ner`, { text });
       setEntities(res.data.result);
     } catch (err) {
       console.error(err);

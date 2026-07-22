@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function TranslateTab() {
   const [text, setText] = useState("");
   const [translation, setTranslation] = useState("");
@@ -9,7 +11,7 @@ function TranslateTab() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("http://127.0.0.1:8000/translate", { text });
+      const res = await axios.post(`${API_URL}/translate`, { text });
       setTranslation(res.data.translation);
     } catch (err) {
       console.error(err);

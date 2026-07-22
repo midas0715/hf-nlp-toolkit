@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function SentimentTab() {
   const [text, setText] = useState("");
   const [result, setResult] = useState(null);
@@ -9,7 +11,7 @@ function SentimentTab() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("http://127.0.0.1:8000/sentiment", { text });
+      const res = await axios.post(`${API_URL}/sentiment`, { text });
       setResult(res.data.result[0]);
     } catch (err) {
       console.error(err);

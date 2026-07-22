@@ -1,62 +1,66 @@
 import { useState } from "react";
 import axios from "axios";
 
-function SearchTab() {
-  const [docsInput, setDocsInput] = useState(
-    "The Reserve Bank of India kept interest rates unchanged.\nManchester United signed a new striker.\nResearchers published a paper on transformer attention."
-  );
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState(null);
+const API_URL = import.meta.env.VITE_API_URL;
+
+function SummarizeTab() {
+  const [text, setText] = useState("");
+  const [maxLength, setMaxLength] = useState(60);
+  const [minLength, setMinLength] = useState(20);
+  const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    const documents = docsInput.split("\n").map((d) => d.trim()).filter(Boolean);
     setLoading(true);
     try {
-      const res = await axios.post("http://127.0.0.1:8000/search", {
-        query,
-        documents,
-        top_k: 3,
+      const res = await axios.post(`${API_URL}/summarize`, {
+        text,
+        max_length: Number(maxLength),
+        min_length: Number(minLength),
       });
-      setResults(res.data.results);
+      setSummary(res.data.summary);
     } catch (err) {
       console.error(err);
-      setResults(null);
+      setSummary("Error — check backend terminal.");
     }
     setLoading(false);
   };
 
   return (
     <div>
-      <label>Documents (one per line):</label>
       <textarea
-        rows={5}
-        value={docsInput}
-        onChange={(e) => setDocsInput(e.target.value)}
+        rows={6}
+        placeholder="Paste a longer passage to summarize..."
+        value={text}
+        onChange={(e) => setText(e.target.value)}
       />
-      <input
-        type="text"
-        placeholder="Search query..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        style={{ width: "100%", marginTop: "8px", padding: "8px" }}
-      />
-      <br />
-      <button onClick={handleSubmit} disabled={loading || !query || !docsInput}>
-        {loading ? "Searching..." : "Search"}
+      <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
+        <label>
+          Min length:{" "}
+          <input
+            type="number"
+            value={minLength}
+            onChange={(e) => setMinLength(e.target.value)}
+            style={{ width: "60px" }}
+          />
+        </label>
+        <label>
+          Max length:{" "}
+          <input
+            type="number"
+            value={maxLength}
+            onChange={(e) => setMaxLength(e.target.value)}
+            style={{ width: "60px" }}
+          />
+        </label>
+      </div>
+      <button onClick={handleSubmit} disabled={loading || !text}>
+        {loading ? "Summarizing..." : "Summarize"}
       </button>
 
-      {results && (
-        <div className="result">
-          {results.map((r, i) => (
-            <div key={i} style={{ marginBottom: "8px" }}>
-              <strong>{(r.score * 100).toFixed(1)}%</strong> — {r.document}
-            </div>
-          ))}
-        </div>
-      )}
+      {summary && <div className="result">{summary}</div>}
     </div>
   );
 }
 
-export default SearchTab;
+export default SummarizeTab;
