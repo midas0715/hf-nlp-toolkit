@@ -1,0 +1,7 @@
+hf-toolkit-env/
+__pycache__/
+*.pyc
+node_modules/
+.env
+frontend/dist/
+frontend/.env
